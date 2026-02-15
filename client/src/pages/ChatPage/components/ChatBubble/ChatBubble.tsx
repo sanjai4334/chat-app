@@ -1,5 +1,6 @@
-import type { ChatMessage } from "../ChatPage";
-import { formatTimeHrMin } from "../utils/dateTimeUtils";
+import "./ChatBubble.css";
+import type { ChatMessage } from "../../ChatPage";
+import { formatTimeHrMin } from "../../utils/dateTimeUtils";
 
 const ChatBubble = ({ content, timeStamp, type }: ChatMessage) => {
     return (

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import plusIcon from "../../../../src/assets/plus.svg";
-import sendIcon from "../../../../src/assets/send.svg";
-import type { ChatMessage } from "../ChatPage";
+import "./ChatFooter.css";
+import type { ChatMessage } from "../../ChatPage";
+import plusIcon from "../../../../../src/assets/plus.svg";
+import sendIcon from "../../../../../src/assets/send.svg";
 
 interface ChatFooterProps {
     sendMessage: (message: Omit<ChatMessage, "type">) => void;

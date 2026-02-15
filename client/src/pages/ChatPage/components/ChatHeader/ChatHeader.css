@@ -1,0 +1,37 @@
+.header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1.5px solid #ffffff26;
+
+    .avatar {
+        height: 45px;
+        width: 45px;
+
+        background-color: #303030;
+        border-radius: 100vmax;
+
+        img {
+            height: 45px;
+            width: 45px;
+        }
+    }
+
+    .username {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .options {
+        margin-left: auto;
+
+        img {
+            height: 30px;
+            width: 30px;
+        }
+    }
+}

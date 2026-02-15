@@ -1,7 +1,7 @@
 import "./ChatPage.css";
-import ChatHeader from "./components/ChatHeader";
-import ChatFooter from "./components/ChatFooter";
-import ChatBubble from "./components/ChatBubble";
+import ChatHeader from "./components/ChatHeader/ChatHeader";
+import ChatFooter from "./components/ChatFooter/ChatFooter";
+import ChatBubble from "./components/ChatBubble/ChatBubble";
 
 export type ChatMessage = {
     content: { text: string };

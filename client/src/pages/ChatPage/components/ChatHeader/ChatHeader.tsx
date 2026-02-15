@@ -1,6 +1,7 @@
-import avatarIcon from "../../../../src/assets/profile-circle.svg";
-import dotMenuIcon from "../../../../src/assets/dot-menu.svg";
-import type { User } from "../ChatPage";
+import "./ChatHeader.css";
+import type { User } from "../../ChatPage";
+import avatarIcon from "../../../../../src/assets/profile-circle.svg";
+import dotMenuIcon from "../../../../../src/assets/dot-menu.svg";
 
 type ChatHeaderProps = User;
 
