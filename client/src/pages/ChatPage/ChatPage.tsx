@@ -21,11 +21,20 @@ interface ChatPageProps {
 }
 
 const ChatPage = ({ messages, sendMessage }: ChatPageProps) => {
+    const chatContainer = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        chatContainer.current?.scrollTo({
+            top: chatContainer.current.scrollHeight,
+            behavior: "smooth",
+        });
+    }, [messages]);
+
     return (
         <div className="chat-page">
             <ChatHeader username={""} avatarUrl={""} />
 
-            <div className="chat-container">
+            <div className="chat-container" ref={chatContainer}>
                 {messages?.map((message, idx) => (
                     <ChatBubble
                         key={idx} // use message id instead
@@ -49,7 +58,7 @@ interface SocketData {
 export default ChatPage;
 
 import { io } from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Socket } from "socket.io-client";
 
 const socket = io("http://localhost:5000");
