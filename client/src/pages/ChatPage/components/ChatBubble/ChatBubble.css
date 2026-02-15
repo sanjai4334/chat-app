@@ -10,7 +10,21 @@
 
     .text {
         overflow-wrap: anywhere;
+
+        .clamp-control {
+            all: unset;
+            cursor: pointer;
+
+            white-space: nowrap;
+
+            margin-left: 6px;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
     }
+
 
     .time-stamp {
         align-self: flex-end;
