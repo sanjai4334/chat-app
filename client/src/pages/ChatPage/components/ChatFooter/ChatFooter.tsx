@@ -5,7 +5,7 @@ import plusIcon from "../../../../../src/assets/plus.svg";
 import sendIcon from "../../../../../src/assets/send.svg";
 
 interface ChatFooterProps {
-    sendMessage: (message: Omit<ChatMessage, "type">) => void;
+    sendMessage: (message: ChatMessage) => void;
 }
 
 const ChatFooter = ({ sendMessage }: ChatFooterProps) => {

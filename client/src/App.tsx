@@ -1,10 +1,10 @@
 import "./App.css";
-import { ChatApp } from "./pages/ChatPage/ChatPage";
+import ChatPage from "./pages/ChatPage/ChatPage";
 
 function App() {
     return (
         <>
-            <ChatApp />
+            <ChatPage />
         </>
     );
 }
