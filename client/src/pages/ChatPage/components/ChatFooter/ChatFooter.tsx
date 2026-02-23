@@ -1,28 +1,15 @@
-import { useState } from "react";
 import "./ChatFooter.css";
-import type { ChatMessage } from "../../ChatPage";
 import plusIcon from "../../../../../src/assets/plus.svg";
 import sendIcon from "../../../../../src/assets/send.svg";
+import type { ChatMessage } from "../../_hooks/useChatPage";
+import { useChatFooter } from "../../_hooks/useChatFooter";
 
-interface ChatFooterProps {
+export interface ChatFooterProps {
     sendMessage: (message: ChatMessage) => void;
 }
 
 const ChatFooter = ({ sendMessage }: ChatFooterProps) => {
-    const [message, setMessage] = useState("");
-
-    const handleSend = () => {
-        if (!message.trim()) return;
-
-        sendMessage({
-            timeStamp: new Date(),
-            content: {
-                text: message,
-            },
-        });
-
-        setMessage("");
-    };
+    const { message, setMessage, handleSend } = useChatFooter({ sendMessage });
 
     return (
         <div className="footer">

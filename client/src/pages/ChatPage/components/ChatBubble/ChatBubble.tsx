@@ -1,7 +1,7 @@
 import "./ChatBubble.css";
-import type { ChatMessage } from "../../ChatPage";
 import { formatTimeHrMin } from "../../utils/dateTimeUtils";
 import { useState } from "react";
+import type { ChatMessage } from "../../_hooks/useChatPage";
 
 const WORD_LIMIT = 135;
 

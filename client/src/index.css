@@ -16,6 +16,13 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --primary-bg-color: #212121;
+  --secondary-bg-color: #303030;
+
+  --primary-border-color: #ffffff26;
+
+  --primary-text-color: white;
 }
 
 /* :root {

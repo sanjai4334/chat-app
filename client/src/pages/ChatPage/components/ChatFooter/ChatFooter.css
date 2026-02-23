@@ -14,6 +14,11 @@
         display: grid;
         place-content: center;
         border-radius: 100vmax;
+        padding: 10px;
+
+        &:hover {
+            background-color: var(--secondary-bg-color);
+        }
 
         img {
             height: 40px;
@@ -30,8 +35,8 @@
         max-width: 70%;
 
         border-radius: 100vmax;
-        border: 1.5px solid #ffffff26;
-        background-color: #303030;
-        color: white;
+        border: 1.5px solid var(--primary-border-color);
+        background-color: var(--secondary-bg-color);
+        color: var(--primary-text-color);
     }
 }
