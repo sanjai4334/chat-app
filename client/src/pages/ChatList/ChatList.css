@@ -1,0 +1,8 @@
+.chat-list {
+    width: 25%;
+
+    border-right: 1px solid var(--primary-border-color);
+    background-color: var(--primary-bg-color);
+    color: var(--primary-text-color);
+
+}

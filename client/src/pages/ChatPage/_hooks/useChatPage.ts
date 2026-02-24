@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { io, type Socket } from "socket.io-client";
+import type { ChatPageProps } from "../ChatPage";
 
 export type ChatMessage = {
     content: { text: string };
@@ -8,6 +9,7 @@ export type ChatMessage = {
 };
 
 export type User = {
+    id: string;
     username: string;
     avatarUrl: string;
 };
@@ -18,21 +20,25 @@ interface SocketData {
 }
 
 const socket = io("http://localhost:5000");
-export const useChatPage = () => {
+export const useChatPage = ({
+    user,
+    setMessages,
+}: Omit<ChatPageProps, "messages">) => {
     const chatContainer = useRef<HTMLDivElement>(null);
-
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
 
     useEffect(() => {
         socket.on("receive_message", (data: SocketData) => {
-            setMessages((prev) => [
+            setMessages((prev) => ({
                 ...prev,
-                {
-                    ...data.message,
-                    timeStamp: new Date(data.message.timeStamp),
-                    type: data.token === socket.id ? "sent" : "received",
-                },
-            ]);
+                [user.id]: [
+                    ...prev[user.id],
+                    {
+                        ...data.message,
+                        timeStamp: new Date(data.message.timeStamp),
+                        type: data.token === socket.id ? "sent" : "received",
+                    },
+                ],
+            }));
             chatContainer.current?.scrollTo({
                 top: chatContainer.current.scrollHeight,
                 behavior: "smooth",
@@ -48,9 +54,8 @@ export const useChatPage = () => {
         socket.emit("send_message", message);
         // setMessages((prev) => [...prev, { ...message, type: "sent" }]);
     };
-    
+
     return {
-        messages,
         sendMessage,
         chatContainer,
     };
