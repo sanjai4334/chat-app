@@ -1,6 +1,6 @@
 import "./ChatFooter.css";
-import plusIcon from "../../../../../src/assets/plus.svg";
-import sendIcon from "../../../../../src/assets/send.svg";
+import PlusIcon from "../../../../../src/assets/plus.svg";
+import SendIcon from "../../../../../src/assets/send.svg";
 import type { ChatMessage } from "../../_hooks/useChatPage";
 import { useChatFooter } from "../../_hooks/useChatFooter";
 
@@ -14,7 +14,7 @@ const ChatFooter = ({ sendMessage }: ChatFooterProps) => {
     return (
         <div className="footer">
             <div className="attach-file">
-                <img src={plusIcon} />
+                <PlusIcon />
             </div>
             <input
                 type="text"
@@ -25,7 +25,7 @@ const ChatFooter = ({ sendMessage }: ChatFooterProps) => {
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
             <button className="send-message" onClick={handleSend}>
-                <img src={sendIcon} />
+                <SendIcon />
             </button>
         </div>
     );

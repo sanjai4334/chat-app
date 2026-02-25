@@ -14,7 +14,7 @@
         background-color: var(--secondary-bg-color);
         border-radius: 100vmax;
 
-        img {
+        * {
             height: 45px;
             width: 45px;
         }

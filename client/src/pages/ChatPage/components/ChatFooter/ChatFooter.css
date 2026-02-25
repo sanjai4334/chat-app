@@ -20,7 +20,7 @@
             background-color: var(--secondary-bg-color);
         }
 
-        img {
+        * {
             height: 40px;
             width: 40px;
         }
