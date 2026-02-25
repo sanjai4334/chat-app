@@ -1,11 +1,23 @@
 import "./ChatBubble.css";
 import { formatTimeHrMin } from "../../utils/dateTimeUtils";
-import { useState } from "react";
-import type { ChatMessage } from "../../_hooks/useChatPage";
+import { useState, type ReactNode } from "react";
+import type { ChatMessageWithStatus } from "../../_hooks/useChatPage";
+import PendingIcon from "../../../../assets/pending.svg";
+import TickSingle from "../../../../assets/tick-single.svg";
+import TickDouble from "../../../../assets/tick-double.svg";
 
 const WORD_LIMIT = 135;
 
-const ChatBubble = ({ content, timeStamp, type }: ChatMessage) => {
+const STATUS_ICON_MAP: Record<ChatMessageWithStatus["status"], ReactNode> = {
+    pending: <PendingIcon className="delivery-indicator" />,
+    sent: <TickSingle className="delivery-indicator" />,
+    delivered: <TickDouble className="delivery-indicator" />,
+    seen: <TickDouble className="delivery-indicator seen" />,
+};
+
+const ChatBubble = ({ message }: { message: ChatMessageWithStatus }) => {
+    const { content, timestamp, type, status } = message;
+
     const isLong = content.text.length > WORD_LIMIT;
     const [isClamped, setIsClamped] = useState(isLong);
 
@@ -13,7 +25,7 @@ const ChatBubble = ({ content, timeStamp, type }: ChatMessage) => {
         ? content.text.slice(0, WORD_LIMIT) + "…"
         : content.text;
 
-    const toggleLabel =  `Show ${isClamped ? "More" : "Less"}`;
+    const toggleLabel = `Show ${isClamped ? "More" : "Less"}`;
 
     return (
         <div className={`chat-bubble ${type}`}>
@@ -32,7 +44,11 @@ const ChatBubble = ({ content, timeStamp, type }: ChatMessage) => {
                 )}
             </div>
 
-            <div className="time-stamp">{formatTimeHrMin(timeStamp)}</div>
+            <div className="sub">
+                {type === "sent" && STATUS_ICON_MAP[status]}
+
+                <div className="time-stamp">{formatTimeHrMin(timestamp)}</div>
+            </div>
         </div>
     );
 };

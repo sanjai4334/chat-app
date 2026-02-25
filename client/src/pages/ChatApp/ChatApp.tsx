@@ -5,7 +5,7 @@ import { useChatApp } from "./_hooks/useChatApp";
 import ChatPageFallback from "../ChatPage/ChatPageFallback";
 
 const ChatApp = () => {
-    const { myUserInfo, users, currentUser, setCurrentUser, messages } =
+    const { myUserInfo, users, currentUser, setCurrentUser, messages, setMessages } =
         useChatApp();
 
     return (
@@ -16,6 +16,7 @@ const ChatApp = () => {
                     myUserInfo={myUserInfo}
                     user={currentUser}
                     messages={messages[currentUser.id] || []}
+                    setMessages={setMessages}
                 />
             ) : (
                 <ChatPageFallback />

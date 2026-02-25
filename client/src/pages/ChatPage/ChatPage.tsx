@@ -2,16 +2,27 @@ import "./ChatPage.css";
 import ChatHeader from "./components/ChatHeader/ChatHeader";
 import ChatFooter from "./components/ChatFooter/ChatFooter";
 import ChatBubble from "./components/ChatBubble/ChatBubble";
-import { useChatPage, type ChatMessage, type User } from "./_hooks/useChatPage";
+import {
+    useChatPage,
+    type ChatMessageWithStatus,
+    type User,
+} from "./_hooks/useChatPage";
+import type { Dispatch, SetStateAction } from "react";
 
 export interface ChatPageProps {
     myUserInfo: Omit<User, "avatarUrl">;
     user: User;
-    messages: ChatMessage[];
+    messages: ChatMessageWithStatus[];
+    setMessages: Dispatch<SetStateAction<Record<string, ChatMessageWithStatus[]>>>;
 }
 
-const ChatPage = ({ myUserInfo, user, messages }: ChatPageProps) => {
-    const { sendMessage, chatContainer } = useChatPage({ myUserInfo, user, messages });
+const ChatPage = ({ myUserInfo, user, messages, setMessages }: ChatPageProps) => {
+    const { sendMessage, chatContainer } = useChatPage({
+        myUserInfo,
+        user,
+        messages,
+        setMessages,
+    });
 
     return (
         <div className="chat-page">
@@ -21,9 +32,7 @@ const ChatPage = ({ myUserInfo, user, messages }: ChatPageProps) => {
                 {messages.map((message, idx) => (
                     <ChatBubble
                         key={idx} // use message id instead
-                        content={message.content}
-                        timeStamp={message.timeStamp}
-                        type={message.type}
+                        message={message}
                     />
                 ))}
             </div>

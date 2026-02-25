@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import type { ChatFooterProps } from "../components/ChatFooter/ChatFooter";
 
 export const useChatFooter = ({
@@ -12,7 +12,8 @@ export const useChatFooter = ({
         if (!message.trim()) return;
 
         sendMessage({
-            timeStamp: new Date(),
+            id: crypto.randomUUID(),
+            timestamp: new Date(),
             content: {
                 text: message,
             },
