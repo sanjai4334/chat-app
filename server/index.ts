@@ -14,15 +14,46 @@ const io = new Server(server, {
     },
 });
 
+const onlineUsers: Record<string, Record<string, string>> = {};
+
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
+    socket.on("register", (user) => {
+        onlineUsers[user.id] = { ...user, socketId: socket.id };
+        io.emit(
+            "users_update",
+            Object.values(onlineUsers).map((user) => {
+                const { socketId, ...rest } = user;
+                return rest;
+            })
+        );
+    });
+
     socket.on("send_message", (data) => {
-        io.emit("receive_message", { message: data, token: socket.id }); // broadcast
+        const receiverSocket = onlineUsers[data.chatId].socketId;
+
+        io.to(receiverSocket).emit("receive_message", data);
+        socket.emit("receive_message", data);
     });
 
     socket.on("disconnect", () => {
-        console.log("User disconnected");
+        const userId = Object.values(onlineUsers).filter(
+            (user) => user.socketId === socket.id
+        )[0]?.id;
+
+        if (!userId) return;
+
+        delete onlineUsers[userId];
+
+        io.emit(
+            "users_update",
+            Object.values(onlineUsers).map((user) => {
+                const { socketId, ...rest } = user;
+                return rest;
+            })
+        );
+        console.log("User disconnected", userId);
     });
 });
 

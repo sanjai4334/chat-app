@@ -3,23 +3,19 @@ import ChatHeader from "./components/ChatHeader/ChatHeader";
 import ChatFooter from "./components/ChatFooter/ChatFooter";
 import ChatBubble from "./components/ChatBubble/ChatBubble";
 import { useChatPage, type ChatMessage, type User } from "./_hooks/useChatPage";
-import type { Dispatch, SetStateAction } from "react";
 
 export interface ChatPageProps {
+    myUserInfo: Omit<User, "avatarUrl">;
     user: User;
     messages: ChatMessage[];
-    setMessages: Dispatch<SetStateAction<Record<string, ChatMessage[]>>>;
 }
 
-const ChatPage = ({ user, messages, setMessages }: ChatPageProps) => {
-    const { sendMessage, chatContainer } = useChatPage({
-        user,
-        setMessages,
-    });
+const ChatPage = ({ myUserInfo, user, messages }: ChatPageProps) => {
+    const { sendMessage, chatContainer } = useChatPage({ myUserInfo, user, messages });
 
     return (
         <div className="chat-page">
-            <ChatHeader username={""} avatarUrl={""} id={""} />
+            <ChatHeader user={user} />
 
             <div className="chat-container" ref={chatContainer}>
                 {messages.map((message, idx) => (

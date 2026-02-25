@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import { io, type Socket } from "socket.io-client";
-import type { ChatPageProps } from "../ChatPage";
+import { socket } from "../../../socket";
 
 export type ChatMessage = {
     content: { text: string };
@@ -14,44 +13,32 @@ export type User = {
     avatarUrl: string;
 };
 
-interface SocketData {
-    message: ChatMessage;
-    token: Socket["id"];
-}
-
-const socket = io("http://localhost:5000");
 export const useChatPage = ({
+    myUserInfo,
     user,
-    setMessages,
-}: Omit<ChatPageProps, "messages">) => {
+    messages,
+}: {
+    myUserInfo: Omit<User, "avatarUrl">;
+    user: User;
+    messages: ChatMessage[];
+}) => {
     const chatContainer = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        socket.on("receive_message", (data: SocketData) => {
-            setMessages((prev) => ({
-                ...prev,
-                [user.id]: [
-                    ...prev[user.id],
-                    {
-                        ...data.message,
-                        timeStamp: new Date(data.message.timeStamp),
-                        type: data.token === socket.id ? "sent" : "received",
-                    },
-                ],
-            }));
-            chatContainer.current?.scrollTo({
-                top: chatContainer.current.scrollHeight,
-                behavior: "smooth",
-            });
+        chatContainer.current?.scrollTo({
+            top: chatContainer.current.scrollHeight,
+            behavior: "smooth",
         });
-
-        return () => {
-            socket.off("receive_message");
-        };
-    }, []);
+    }, [messages]);
 
     const sendMessage = (message: ChatMessage) => {
-        socket.emit("send_message", message);
+        console.log("user: ", user);
+        console.log("myUserInfo: ", myUserInfo);
+        socket.emit("send_message", {
+            senderId: myUserInfo.id,
+            chatId: user.id,
+            message,
+        });
         // setMessages((prev) => [...prev, { ...message, type: "sent" }]);
     };
 

@@ -1,5 +1,6 @@
 .chat-list {
     width: 25%;
+    height: 100dvh;
 
     border-right: 1px solid var(--primary-border-color);
     background-color: var(--primary-bg-color);

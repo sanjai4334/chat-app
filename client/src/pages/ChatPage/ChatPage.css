@@ -8,6 +8,12 @@
     height: 100dvh;
     background-color: var(--primary-bg-color);
 
+    &.fallback-page {
+        justify-content: center;
+        align-items: center;
+        color: var(--primary-text-color);
+    }
+
     * {
         box-sizing: border-box;
     }
