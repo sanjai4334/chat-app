@@ -14,13 +14,27 @@ const io = new Server(server, {
     },
 });
 
-const onlineUsers: Record<string, Record<string, string>> = {};
+export type ChatMessage = {
+    content: { text: string };
+    timeStamp: string;
+    senderId: string;
+    chatId: string;
+};
+
+export type User = {
+    id: string;
+    socketId: string;
+};
+
+const onlineUsers: Record<string, User> = {};
+const offlineMessageQueue: Record<string, ChatMessage[]> = {};
 
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
-    socket.on("register", (user) => {
+    socket.on("register", (user: User) => {
         onlineUsers[user.id] = { ...user, socketId: socket.id };
+
         io.emit(
             "users_update",
             Object.values(onlineUsers).map((user) => {
@@ -28,23 +42,42 @@ io.on("connection", (socket) => {
                 return rest;
             })
         );
+
+        if (user.id in offlineMessageQueue) {
+            offlineMessageQueue[user.id].forEach((message) => {
+                io.to(socket.id).emit(
+                    "receive_message",
+                    message
+                );
+            });
+
+            delete offlineMessageQueue[user.id];
+        }
     });
 
-    socket.on("send_message", (data) => {
-        const receiverSocket = onlineUsers[data.chatId].socketId;
+    socket.on("send_message", (data: ChatMessage) => {
+        const receiverSocket = onlineUsers[data.chatId]?.socketId;
 
-        io.to(receiverSocket).emit("receive_message", data);
+        if (receiverSocket) {
+            io.to(receiverSocket).emit("receive_message", data);
+        } else {
+            offlineMessageQueue[data.chatId] = [
+                ...(offlineMessageQueue[data.chatId] || []),
+                data,
+            ];
+        }
+
         socket.emit("receive_message", data);
     });
 
     socket.on("disconnect", () => {
-        const userId = Object.values(onlineUsers).filter(
+        const user = Object.values(onlineUsers).find(
             (user) => user.socketId === socket.id
-        )[0]?.id;
+        );
 
-        if (!userId) return;
+        if (!user) return;
 
-        delete onlineUsers[userId];
+        delete onlineUsers[user.id];
 
         io.emit(
             "users_update",
@@ -53,7 +86,7 @@ io.on("connection", (socket) => {
                 return rest;
             })
         );
-        console.log("User disconnected", userId);
+        console.log("User disconnected", user.id);
     });
 });
 
