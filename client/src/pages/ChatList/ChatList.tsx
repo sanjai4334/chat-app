@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { User } from "../ChatPage/_hooks/useChatPage";
 import "./ChatList.css";
 import ChatListItem from "./components/ChatListItem/ChatListItem";
+import type { User } from "../../types";
 
 interface ChatListProps {
     users: User[];

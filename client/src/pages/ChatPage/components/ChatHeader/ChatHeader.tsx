@@ -1,7 +1,7 @@
 import "./ChatHeader.css";
 import AvatarIcon from "../../../../../src/assets/profile-circle.svg";
 import DotMenuIcon from "../../../../../src/assets/dot-menu.svg";
-import type { User } from "../../_hooks/useChatPage";
+import type { User } from "../../../../types";
 
 const ChatHeader = ({ user }: { user: User }) => {
     return (

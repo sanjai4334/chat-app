@@ -1,11 +1,11 @@
 import "./ChatFooter.css";
 import PlusIcon from "../../../../../src/assets/plus.svg";
 import SendIcon from "../../../../../src/assets/send.svg";
-import type { ChatMessage } from "../../_hooks/useChatPage";
 import { useChatFooter } from "../../_hooks/useChatFooter";
+import type { MessageDTO } from "../../../../types";
 
 export interface ChatFooterProps {
-    sendMessage: (message: ChatMessage) => void;
+    sendMessage: (message: MessageDTO) => void;
 }
 
 const ChatFooter = ({ sendMessage }: ChatFooterProps) => {

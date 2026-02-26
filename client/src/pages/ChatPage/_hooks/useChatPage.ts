@@ -1,23 +1,6 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import { socket } from "../../../socket";
-
-export interface ChatMessage {
-    id: string;
-    content: { text: string };
-    timestamp: Date;
-    type?: "sent" | "received";
-    tempId?: string;
-}
-
-export interface ChatMessageWithStatus extends ChatMessage {
-    status: "pending" | "sent" | "delivered" | "seen";
-}
-
-export type User = {
-    id: string;
-    username: string;
-    avatarUrl: string;
-};
+import type { Message, MessageDTO, User, UserDTO } from "../../../types";
 
 export const useChatPage = ({
     myUserInfo,
@@ -25,12 +8,10 @@ export const useChatPage = ({
     messages,
     setMessages,
 }: {
-    myUserInfo: Omit<User, "avatarUrl">;
+    myUserInfo: UserDTO;
     user: User;
-    messages: ChatMessage[];
-    setMessages: Dispatch<
-        SetStateAction<Record<string, ChatMessageWithStatus[]>>
-    >;
+    messages: Message[];
+    setMessages: Dispatch<SetStateAction<Record<string, Message[]>>>;
 }) => {
     const chatContainer = useRef<HTMLDivElement>(null);
 
@@ -41,10 +22,7 @@ export const useChatPage = ({
         });
     }, [messages]);
 
-    const sendMessage = (message: ChatMessage) => {
-        console.log("message: ", message);
-        console.log("user: ", user);
-        console.log("myUserInfo: ", myUserInfo);
+    const sendMessage = (message: MessageDTO) => {
         socket.emit("send_message", {
             senderId: myUserInfo.id,
             chatId: user.id,

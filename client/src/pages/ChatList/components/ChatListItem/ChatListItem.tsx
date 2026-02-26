@@ -1,6 +1,6 @@
 import "./ChatListItem.css";
 import AvatarIcon from "../../../../../src/assets/profile-circle.svg";
-import type { User } from "../../../ChatPage/_hooks/useChatPage";
+import type { User } from "../../../../types";
 
 interface ChatListItemProps {
     user: User;

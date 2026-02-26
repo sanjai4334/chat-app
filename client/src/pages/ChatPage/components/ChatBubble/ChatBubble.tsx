@@ -1,22 +1,22 @@
 import "./ChatBubble.css";
 import { formatTimeHrMin } from "../../utils/dateTimeUtils";
 import { useState, type ReactNode } from "react";
-import type { ChatMessageWithStatus } from "../../_hooks/useChatPage";
 import PendingIcon from "../../../../assets/pending.svg";
 import TickSingle from "../../../../assets/tick-single.svg";
 import TickDouble from "../../../../assets/tick-double.svg";
+import type { Message, MessageStatus } from "../../../../types";
 
 const WORD_LIMIT = 135;
 
-const STATUS_ICON_MAP: Record<ChatMessageWithStatus["status"], ReactNode> = {
+const STATUS_ICON_MAP: Record<MessageStatus, ReactNode> = {
     pending: <PendingIcon className="delivery-indicator" />,
     sent: <TickSingle className="delivery-indicator" />,
     delivered: <TickDouble className="delivery-indicator" />,
     seen: <TickDouble className="delivery-indicator seen" />,
 };
 
-const ChatBubble = ({ message }: { message: ChatMessageWithStatus }) => {
-    const { content, timestamp, type, status } = message;
+const ChatBubble = ({ message }: { message: Message }) => {
+    const { content, timestamp, type } = message;
 
     const isLong = content.text.length > WORD_LIMIT;
     const [isClamped, setIsClamped] = useState(isLong);
@@ -45,7 +45,7 @@ const ChatBubble = ({ message }: { message: ChatMessageWithStatus }) => {
             </div>
 
             <div className="sub">
-                {type === "sent" && STATUS_ICON_MAP[status]}
+                {type === "sent" && STATUS_ICON_MAP[message.status]}
 
                 <div className="time-stamp">{formatTimeHrMin(timestamp)}</div>
             </div>

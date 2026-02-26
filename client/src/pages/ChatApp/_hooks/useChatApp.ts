@@ -1,33 +1,12 @@
 import { useEffect, useState } from "react";
-import type {
-    ChatMessage,
-    ChatMessageWithStatus,
-    User,
-} from "../../ChatPage/_hooks/useChatPage";
 import { socket } from "../../../socket";
-
-interface SocketData {
-    message: ChatMessage;
-    senderId: string;
-    chatId: string;
-}
-
-interface MessageEventPayload {
-    messageId: string;
-    tempId?: string;
-    senderId: string;
-    chatId: string;
-
-    type: "status_update" | "reaction" | "edit" | "delete";
-
-    data: {
-        status?: ChatMessageWithStatus["status"];
-        reaction?: string;
-        editedData?: { text?: string };
-    };
-
-    timestamp: Date;
-}
+import type {
+    Message,
+    MessageEnvelope,
+    MessageEventEnvelope,
+    User,
+    UserDTO,
+} from "../../../types";
 
 const loadUser = () => {
     const saved = sessionStorage.getItem("chatUser");
@@ -48,7 +27,7 @@ export const useChatApp = () => {
     const [users, setUsers] = useState<User[]>([]);
 
     const [messages, setMessages] = useState<
-        Record<string, ChatMessageWithStatus[]>
+        Record<MessageEnvelope["chatId"], Message[]>
     >({});
     const [currentUser, setCurrentUser] = useState<User | undefined>();
 
@@ -57,7 +36,7 @@ export const useChatApp = () => {
     useEffect(() => {
         socket.emit("register", myUserInfo);
 
-        const handleUsers = (users: { id: string; username: string }[]) => {
+        const handleUsers = (users: UserDTO[]) => {
             setUsers(
                 users
                     .filter((user) => user.id !== myUserInfo.id)
@@ -65,36 +44,48 @@ export const useChatApp = () => {
             );
         };
 
-        const handleMessages = (data: SocketData) => {
+        const handleMessages = (data: MessageEnvelope) => {
+            const isOwnMessage = data.senderId === myUserInfo.id;
+
             const chatKey =
                 data.senderId === myUserInfo.id ? data.chatId : data.senderId;
+
+            const baseMsg = {
+                ...data.message,
+                timestamp: new Date(data.message.timestamp),
+            };
+
+            const newMessage: Message = isOwnMessage
+                ? {
+                      ...baseMsg,
+                      type: "sent",
+                      status: "pending",
+                  }
+                : {
+                      ...baseMsg,
+                      type: "received",
+                  };
+
             setMessages((prev) => ({
                 ...prev,
-                [chatKey]: [
-                    ...(prev[chatKey] || []),
-                    {
-                        ...data.message,
-                        timestamp: new Date(data.message.timestamp),
-                        type:
-                            data.senderId === myUserInfo.id
-                                ? "sent"
-                                : "received",
-                        status: "sent",
-                    },
-                ],
+                [chatKey]: [...(prev[chatKey] || []), newMessage],
             }));
         };
 
         // TODO: think of a way to use pending status
 
-        const updateMessage = (eventData: MessageEventPayload) => {
+        const updateMessage = (envelope: MessageEventEnvelope) => {
             const {
+                // senderId,
                 chatId,
-                messageId,
-                tempId,
-                type,
-                data: { status },
-            } = eventData;
+
+                event: {
+                    messageId,
+                    tempId,
+                    type,
+                    payload: { status },
+                },
+            } = envelope;
             const lookupId = tempId || messageId;
 
             switch (type) {
@@ -107,8 +98,7 @@ export const useChatApp = () => {
                                     return {
                                         ...message,
                                         status: status,
-                                        id: 
-                                        messageId,
+                                        id: messageId,
                                     };
                                 } else return message;
                             }
