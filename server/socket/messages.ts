@@ -41,6 +41,9 @@ export function handleSendMessage(
         io.to(receiverSocket).emit("receive_message", envelope);
 
         handleUpdateMessage(io, socketId, envelope, "status_update", {
+            status: "sent",
+        });
+        handleUpdateMessage(io, socketId, envelope, "status_update", {
             status: "delivered",
         });
     } else {
@@ -61,9 +64,7 @@ export function handleUpdateMessage(
     type: MessageEventType,
     payload: MessageEvent["payload"]
 ) {
-    const isDeliveryAck =
-        type === "status_update" &&
-        (payload.status === "sent" || payload.status === "delivered");
+    const isDeliveryAck = type === "status_update" && payload.status === "sent";
 
     const eventEnvelope: MessageEventEnvelope = {
         senderId: isDeliveryAck ? envelope.chatId : envelope.senderId,
@@ -71,11 +72,7 @@ export function handleUpdateMessage(
         chatId: envelope.chatId,
 
         event: {
-            messageId: isDeliveryAck
-                ? crypto.randomUUID()
-                : envelope.message.id,
-
-            ...(isDeliveryAck && { tempId: envelope.message.id }),
+            messageId: envelope.message.id,
 
             type,
             payload,

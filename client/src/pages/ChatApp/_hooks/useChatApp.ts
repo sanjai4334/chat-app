@@ -79,14 +79,10 @@ export const useChatApp = () => {
                 // senderId,
                 chatId,
 
-                event: {
-                    messageId,
-                    tempId,
-                    type,
-                    payload: { status },
-                },
+                event: { messageId, type, payload },
             } = envelope;
-            const lookupId = tempId || messageId;
+
+            const { status } = payload;
 
             switch (type) {
                 case "status_update":
@@ -94,7 +90,7 @@ export const useChatApp = () => {
                     setMessages((messages) => {
                         const updateMessages = (messages[chatId] || []).map(
                             (message) => {
-                                if (lookupId === message.id) {
+                                if (messageId === message.id) {
                                     return {
                                         ...message,
                                         status: status,

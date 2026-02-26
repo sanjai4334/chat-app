@@ -25,7 +25,6 @@ export type MessageEventType = "status_update" | "reaction" | "edit" | "delete";
 
 export type MessageEvent = {
     messageId: string;
-    tempId?: string;
 
     type: MessageEventType;
 
