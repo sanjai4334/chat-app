@@ -1,5 +1,5 @@
-import { ChatMessage, User } from "../types/chat";
+import { MessageDTO, MessageEnvelope, User } from "../types";
 
-export const onlineUsers: Record<string, User> = {};
-export const offlineMessageQueue: Record<string, ChatMessage[]> = {};
-export const offlineMessageUpdatesQueue: Record<string, ChatMessage[]> = {};
+export const onlineUsers: Record<User["id"], User> = {};
+export const offlineMessageQueue: Record<MessageEnvelope['chatId'], MessageEnvelope[]> = {};
+export const offlineMessageUpdatesQueue: Record<MessageEnvelope['chatId'], MessageEnvelope[]> = {};

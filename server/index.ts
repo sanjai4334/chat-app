@@ -5,7 +5,7 @@ import cors from "cors";
 
 import { registerUser, removeUser } from "./socket/presence";
 import { deliverOfflineMessages, handleSendMessage } from "./socket/messages";
-import { User, ChatMessage } from "./types/chat";
+import { MessageEnvelope, UserDTO } from "./types";
 
 const app = express();
 app.use(cors());
@@ -19,12 +19,12 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
-    socket.on("register", (user: User) => {
+    socket.on("register", (user: UserDTO) => {
         registerUser(io, socket.id, user);
         deliverOfflineMessages(io, socket.id, user.id);
     });
 
-    socket.on("send_message", (data: ChatMessage) => {
+    socket.on("send_message", (data: MessageEnvelope) => {
         handleSendMessage(io, socket.id, data);
     });
 

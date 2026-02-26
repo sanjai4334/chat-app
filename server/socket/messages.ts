@@ -1,30 +1,29 @@
 import { Server } from "socket.io";
-import {
-    ChatMessage,
-    ChatMessageWithStatus,
-    MessageEventPayload,
-} from "../types/chat";
 import { onlineUsers, offlineMessageQueue } from "./state";
+import {
+    MessageEnvelope,
+    MessageEvent,
+    MessageEventEnvelope,
+    MessageEventType,
+    User,
+} from "../types";
 
 export function deliverOfflineMessages(
     io: Server,
     socketId: string,
-    userId: string
+    userId: User["id"]
 ) {
     if (!offlineMessageQueue[userId]) return;
 
     const sender = onlineUsers[offlineMessageQueue[userId][0].senderId];
-    console.log("sender: ", sender);
 
     offlineMessageQueue[userId].forEach((msg) => {
         io.to(socketId).emit("receive_message", msg);
 
         if (sender) {
-            handleUpdateMessage(
-                msg as ChatMessageWithStatus,
-                io,
-                sender.socketId
-            );
+            handleUpdateMessage(io, sender.socketId, msg, "status_update", {
+                status: "delivered",
+            });
         }
     });
 
@@ -34,46 +33,55 @@ export function deliverOfflineMessages(
 export function handleSendMessage(
     io: Server,
     socketId: string,
-    data: ChatMessage
+    envelope: MessageEnvelope
 ) {
-    const receiverSocket = onlineUsers[data.chatId]?.socketId;
+    const receiverSocket = onlineUsers[envelope.chatId]?.socketId;
 
     if (receiverSocket) {
-        io.to(receiverSocket).emit("receive_message", data);
-        handleUpdateMessage(data as ChatMessageWithStatus, io, socketId);
+        io.to(receiverSocket).emit("receive_message", envelope);
+
+        handleUpdateMessage(io, socketId, envelope, "status_update", {
+            status: "delivered",
+        });
     } else {
-        offlineMessageQueue[data.chatId] = [
-            ...(offlineMessageQueue[data.chatId] || []),
-            data,
+        handleUpdateMessage(io, socketId, envelope, "status_update", {
+            status: "sent",
+        });
+        offlineMessageQueue[envelope.chatId] = [
+            ...(offlineMessageQueue[envelope.chatId] || []),
+            envelope,
         ];
     }
-
 }
 
 export function handleUpdateMessage(
-    message: any,
     io: Server,
-    socketId: string
+    socketId: string,
+    envelope: MessageEnvelope,
+    type: MessageEventType,
+    payload: MessageEvent["payload"]
 ) {
-    console.log("message: ", message);
-    const payload: MessageEventPayload = {
-        messageId:
-            message.status === "sent"
+    const isDeliveryAck =
+        type === "status_update" &&
+        (payload.status === "sent" || payload.status === "delivered");
+
+    const eventEnvelope: MessageEventEnvelope = {
+        senderId: isDeliveryAck ? envelope.chatId : envelope.senderId,
+
+        chatId: envelope.chatId,
+
+        event: {
+            messageId: isDeliveryAck
                 ? crypto.randomUUID()
-                : message.message.id,
-        ...(message.status === "sent" ? { tempId: message.id } : {}),
-        senderId: message.senderId,
-        chatId: message.chatId,
+                : envelope.message.id,
 
-        type: "status_update",
+            ...(isDeliveryAck && { tempId: envelope.message.id }),
 
-        data: {
-            status: "delivered",
+            type,
+            payload,
+            timestamp: envelope.message.timestamp,
         },
-
-        timestamp: message.message.timestamp,
     };
-    console.log("payload: ", payload);
 
-    io.to(socketId).emit("update_message", payload);
+    io.to(socketId).emit("update_message", eventEnvelope);
 }

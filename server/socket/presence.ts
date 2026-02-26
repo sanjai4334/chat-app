@@ -1,8 +1,8 @@
 import { onlineUsers } from "./state";
-import { User } from "../types/chat";
 import { Server } from "socket.io";
+import { UserDTO } from "../types";
 
-export function registerUser(io: Server, socketId: string, user: User) {
+export function registerUser(io: Server, socketId: string, user: UserDTO) {
     onlineUsers[user.id] = { ...user, socketId };
 
     io.emit(
