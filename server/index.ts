@@ -4,8 +4,12 @@ import { Server } from "socket.io";
 import cors from "cors";
 
 import { registerUser, removeUser } from "./socket/presence";
-import { deliverOfflineMessages, handleSendMessage } from "./socket/messages";
-import { MessageEnvelope, UserDTO } from "./types";
+import {
+    deliverOfflineMessages,
+    handleSendMessage,
+    handleMarkMessagesRead,
+} from "./socket/messages";
+import { MessageEnvelope, MessageEventEnvelope, UserDTO } from "./types";
 
 const app = express();
 app.use(cors());
@@ -26,6 +30,10 @@ io.on("connection", (socket) => {
 
     socket.on("send_message", (data: MessageEnvelope) => {
         handleSendMessage(io, socket.id, data);
+    });
+
+    socket.on("mark_messages_read", (data: MessageEventEnvelope) => {
+        handleMarkMessagesRead(io, data);
     });
 
     socket.on("disconnect", () => {

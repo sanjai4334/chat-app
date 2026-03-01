@@ -29,6 +29,9 @@ export const useChatApp = () => {
     const [messages, setMessages] = useState<
         Record<MessageEnvelope["chatId"], Message[]>
     >({});
+    const [unreadMessages, setUnreadMessages] = useState<
+        Record<MessageEnvelope["chatId"], Message["id"][]>
+    >({});
     const [currentUser, setCurrentUser] = useState<User | undefined>();
 
     const [myUserInfo] = useState(loadUser);
@@ -70,17 +73,30 @@ export const useChatApp = () => {
                 ...prev,
                 [chatKey]: [...(prev[chatKey] || []), newMessage],
             }));
-        };
 
-        // TODO: think of a way to use pending status
+            if (!isOwnMessage) {
+                setUnreadMessages((prev) => {
+                    if ((prev[chatKey] || []).includes(data.message.id)) {
+                        return prev;
+                    }
+
+                    return {
+                        ...prev,
+                        [chatKey]: [...(prev[chatKey] || []), data.message.id],
+                    };
+                });
+            }
+        };
 
         const updateMessage = (envelope: MessageEventEnvelope) => {
             const {
-                // senderId,
+                senderId,
                 chatId,
 
                 event: { messageId, type, payload },
             } = envelope;
+
+            const chatKey = senderId === myUserInfo.id ? chatId : senderId;
 
             const { status } = payload;
 
@@ -88,19 +104,18 @@ export const useChatApp = () => {
                 case "status_update":
                     if (!status) return;
                     setMessages((messages) => {
-                        const updateMessages = (messages[chatId] || []).map(
+                        const updateMessages = (messages[chatKey] || []).map(
                             (message) => {
                                 if (messageId === message.id) {
                                     return {
                                         ...message,
                                         status: status,
-                                        id: messageId,
                                     };
                                 } else return message;
                             }
                         );
 
-                        return { ...messages, [chatId]: updateMessages };
+                        return { ...messages, [chatKey]: updateMessages };
                     });
                     return;
                 case "reaction":
@@ -112,13 +127,19 @@ export const useChatApp = () => {
             }
         };
 
+        // const markMessagesRead = (envelope: MessageEventEnvelope) => {
+        //     messages.
+        // }
+
         socket.on("users_update", handleUsers);
         socket.on("receive_message", handleMessages);
         socket.on("update_message", updateMessage);
+        // socket.on("mark_messages_read", markMessagesRead);
 
         return () => {
             socket.off("users_update", handleUsers);
             socket.off("receive_message", handleMessages);
+            socket.off("update_message", updateMessage);
         };
     }, []);
 
@@ -129,5 +150,7 @@ export const useChatApp = () => {
         setCurrentUser,
         messages,
         setMessages,
+        unreadMessages,
+        setUnreadMessages,
     };
 };

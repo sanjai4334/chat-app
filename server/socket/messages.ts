@@ -60,25 +60,54 @@ export function handleSendMessage(
 export function handleUpdateMessage(
     io: Server,
     socketId: string,
-    envelope: MessageEnvelope,
+    envelope: MessageEnvelope | MessageEventEnvelope,
     type: MessageEventType,
     payload: MessageEvent["payload"]
 ) {
     const isDeliveryAck = type === "status_update" && payload.status === "sent";
 
-    const eventEnvelope: MessageEventEnvelope = {
-        senderId: isDeliveryAck ? envelope.chatId : envelope.senderId,
+    const eventEnvelope: MessageEventEnvelope =
+        "message" in envelope
+            ? {
+                  senderId: isDeliveryAck ? envelope.chatId : envelope.senderId,
 
-        chatId: envelope.chatId,
+                  chatId: envelope.chatId,
 
-        event: {
-            messageId: envelope.message.id,
+                  event: {
+                      messageId: envelope.message.id,
 
-            type,
-            payload,
-            timestamp: envelope.message.timestamp,
-        },
-    };
+                      type,
+                      payload,
+                      timestamp: envelope.message.timestamp,
+                  },
+              }
+            : envelope;
 
     io.to(socketId).emit("update_message", eventEnvelope);
+}
+
+export function handleMarkMessagesRead(
+    io: Server,
+    envelope: MessageEventEnvelope
+) {
+    const receiverSocket = onlineUsers[envelope.chatId]?.socketId;
+
+    if (receiverSocket) {
+        const messageIds = Array.isArray(envelope.event.messageId)
+            ? envelope.event.messageId
+            : [envelope.event.messageId];
+
+        messageIds.forEach((id) => {
+            handleUpdateMessage(
+                io,
+                receiverSocket,
+                {
+                    ...envelope,
+                    event: { ...envelope.event, messageId: id },
+                },
+                "status_update",
+                { status: "seen" }
+            );
+        });
+    }
 }

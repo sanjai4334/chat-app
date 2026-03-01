@@ -24,7 +24,7 @@ export type MessageStatus = "pending" | "sent" | "delivered" | "seen";
 export type MessageEventType = "status_update" | "reaction" | "edit" | "delete";
 
 export type MessageEvent = {
-    messageId: string;
+    messageId: string | string[];
 
     type: MessageEventType;
 

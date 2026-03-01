@@ -13,6 +13,7 @@ const ChatList = ({ users, setCurrentUser }: ChatListProps) => {
         <div className="chat-list">
             {users.map((user) => (
                 <ChatListItem
+                    key={user.id}
                     user={user}
                     onClickItem={(user: User) => {
                         setCurrentUser(user);
