@@ -10,20 +10,20 @@ This project demonstrates real-time communication using WebSockets and a modern 
 
 ### Frontend
 
-* React (Vite)
-* TypeScript
-* Socket.io Client
+-   React (Vite)
+-   TypeScript
+-   Socket.io Client
 
 ### Backend
 
-* Node.js
-* Express
-* Socket.io
+-   Node.js
+-   Express
+-   Socket.io
 
 ### Tooling
 
-* pnpm workspaces
-* nodemon
+-   pnpm workspaces
+-   nodemon
 
 ---
 
@@ -61,7 +61,7 @@ pnpm install
 ### 3️⃣ Start the backend
 
 ```
-pnpm --filter chat-server dev
+pnpm --filter server dev
 ```
 
 ---
