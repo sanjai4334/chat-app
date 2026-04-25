@@ -28,7 +28,10 @@ const ChatBubble = ({ message }: { message: Message }) => {
     const toggleLabel = `Show ${isClamped ? "More" : "Less"}`;
 
     return (
-        <div className={`chat-bubble ${type}`}>
+        <div
+            className={`chat-bubble ${type}`}
+            data-readable-message-id={type === "received" ? message.id : undefined}
+        >
             <div className="text">
                 {displayText}
 
