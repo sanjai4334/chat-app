@@ -5,17 +5,19 @@
 ```mermaid
 erDiagram
 
-USER ||--o{ CHAT_MEMBER : joins
-CHAT ||--o{ CHAT_MEMBER : contains
+CHAT ||--|| DM_CHAT : extends
+CHAT ||--|| GROUP_CHAT : extends
 
-CHAT ||--o{ MESSAGE : has
-USER ||--o{ MESSAGE : sends
+CHAT ||--o{ MESSAGE : contains
 
-MESSAGE ||--o{ MESSAGE_REACTION : has
-USER ||--o{ MESSAGE_REACTION : reacts
+DM_CHAT ||--o{ DM_MEMBER : contains
+GROUP_CHAT ||--o{ GROUP_MEMBER : contains
 
-MESSAGE ||--o{ MESSAGE_RECEIPT : has
-USER ||--o{ MESSAGE_RECEIPT : receives
+USER ||--o{ DM_MEMBER : participates
+USER ||--o{ GROUP_MEMBER : participates
+
+MESSAGE ||--o{ MESSAGE_REACTION : contains
+MESSAGE ||--o{ MESSAGE_RECEIPT : contains
 ```
 
 ## Notes

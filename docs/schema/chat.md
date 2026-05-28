@@ -1,47 +1,119 @@
 # Chat Schema
 
-## Purpose
+## Overview
 
-Represents a conversation between users.
+Chats represent generic conversation containers.
 
-## Chat Entity
+The base chat table exists to provide:
+
+-   unified conversation identity
+-   shared message ownership
+-   shared socket routing
+-   shared pagination infrastructure
+
+Business-specific behavior lives in specialized tables.
+
+---
+
+# Chat
 
 ```ts
-type ChatType = "dm" | "group";
-
 type Chat = {
     id: string;
 
-    type: ChatType;
+    type: "dm" | "group";
 
     createdAt: string;
 };
 ```
 
-## Chat Member Entity
+## Notes
+
+The base chat entity intentionally remains minimal.
+
+It is used for:
+
+-   message ownership
+-   socket room identity
+-   pagination
+-   realtime synchronization
+
+It is NOT responsible for:
+
+-   membership semantics
+-   DM metadata
+-   group metadata
+
+---
+
+# DMChat
 
 ```ts
-type ChatMember = {
+type DMChat = {
     chatId: string;
 
-    userId: string;
-
-    joinedAt: string;
+    /**
+     * deterministic sorted participant key
+     *
+     * example:
+     * u1:u2
+     */
+    dmKey: string;
 };
-```
-
-## Relationships
-
-```mermaid
-erDiagram
-
-USER ||--o{ CHAT_MEMBER : joins
-CHAT ||--o{ CHAT_MEMBER : contains
 ```
 
 ## Notes
 
--   chats do not store participantIds directly
--   membership is normalized through chat_members
--   enables future roles/admin systems
--   supports group chats cleanly
+DM chats maintain separate metadata because
+DMs have significantly simpler lifecycle semantics
+than groups.
+
+The dmKey exists only to:
+
+-   prevent duplicate DMs
+-   guarantee deterministic uniqueness
+
+---
+
+# DMMember
+
+```ts
+type DMMember = {
+    chatId: string;
+
+    userId: string;
+
+    blocked: boolean;
+};
+```
+
+## Notes
+
+DM memberships intentionally remain lightweight.
+
+DMs only track:
+
+-   participation
+-   block state
+
+DMs do not currently require:
+
+-   roles
+-   invites
+-   moderation lifecycle
+-   ownership semantics
+
+---
+
+# Future Group Architecture
+
+Groups are intentionally deferred for later design.
+
+Groups are expected to evolve into significantly richer domains with:
+
+-   roles
+-   moderation
+-   invites
+-   ownership
+-   permissions
+-   audit history
